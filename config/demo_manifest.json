@@ -1,6 +1,6 @@
 {
   "version": "2.0",
-  "description": "AT&T FinOps AI Governance Demo Manifest — source of truth for PDF generation and bronze table data. All 15 AI vendor contracts are defined here. Both the PDF generator and the bronze CSV loader derive from this file.",
+  "description": "Telco Bricks FinOps AI Governance Demo Manifest — source of truth for PDF generation and bronze table data. All 15 AI vendor contracts are defined here. Both the PDF generator and the bronze CSV loader derive from this file.",
   "demo_date_context": "Demo assumes 'today' is approximately April 2026. Adjust contract_end dates if demoing significantly later.",
 
   "ai_services": [
@@ -29,7 +29,7 @@
       "service_id": "SVC-0001",
       "service_name": "GPT-4 Turbo Enterprise",
       "vendor": "OpenAI",
-      "business_unit": "AT&T Business",
+      "business_unit": "Telco Bricks Business",
       "deployment_regions": ["US-East", "US-West"],
       "service_category": "LLM API",
       "commitment_type": "Enterprise",
@@ -586,7 +586,7 @@
         "step": 1,
         "surface": "Genie (data_explorer)",
         "question": "Which AI vendor contracts are trending over committed spend this quarter, and by how much?",
-        "expected_results": "AI-0001 OpenAI trending ~$1.5M over $8M committed (AT&T Business BU). Possibly AI-0005 NVIDIA depending on burst usage.",
+        "expected_results": "AI-0001 OpenAI trending ~$1.5M over $8M committed (Telco Bricks Business BU). Possibly AI-0005 NVIDIA depending on burst usage.",
         "narrative": "Find the problem — surface FinOps risk"
       },
       {
@@ -606,21 +606,21 @@
       {
         "step": 4,
         "surface": "Knowledge Assistant (contract_analyst)",
-        "question": "What are the data-residency and training-data-usage clauses in the AT&T–OpenAI GPT-4 Turbo Enterprise agreement?",
+        "question": "What are the data-residency and training-data-usage clauses in the Telco Bricks–OpenAI GPT-4 Turbo Enterprise agreement?",
         "expected_results": "Contract AI-0001 — data residency US-East/US-West only, training data language is ambiguous: 'may be retained for up to 30 days for abuse monitoring and service improvement.' No explicit prohibition on model training beyond 'without explicit opt-in.'",
         "narrative": "Understand the contract language — what is the actual governance risk?"
       },
       {
         "step": 5,
         "surface": "Knowledge Assistant (contract_analyst)",
-        "question": "Does the AT&T–Anthropic Claude 3 Opus agreement permit AT&T customer data to be used for model training?",
+        "question": "Does the Telco Bricks–Anthropic Claude 3 Opus agreement permit Telco Bricks customer data to be used for model training?",
         "expected_results": "Contract AI-0002 — NO. Explicit language: 'Vendor will NOT use Customer Inputs, Outputs, or any derived data to train, fine-tune, or evaluate any foundation model under any circumstance.' 30-day auto-delete on prompts/completions.",
         "narrative": "Contrast — what governance looks like when done right"
       },
       {
         "step": 6,
         "surface": "Salesforce MCP (governance_actions)",
-        "question": "Flag the OpenAI GPT-4 Turbo Enterprise contract for governance review — missing AI governance addendum, ambiguous training-data language, expiring in Jun 2026, trending over committed spend. Assign to the AT&T AI Council.",
+        "question": "Flag the OpenAI GPT-4 Turbo Enterprise contract for governance review — missing AI governance addendum, ambiguous training-data language, expiring in Jun 2026, trending over committed spend. Assign to the Telco Bricks AI Council.",
         "expected_results": "Opportunity/Task created in Salesforce, assigned to AI Council queue",
         "narrative": "Take action — governance issue routed to the right team"
       }
@@ -630,7 +630,7 @@
   "data_quality_issues": {
     "description": "Intentional issues injected into bronze CSVs to make the silver layer meaningful. These are deterministic — every SA gets the same issues.",
     "bu_code_variants": {
-      "AI-0001": "ATT-BUS",
+      "AI-0001": "TB-BUS",
       "AI-0005-ENG": "ENG",
       "AI-0009-CW": "CW",
       "AI-0014-MOB": "MOB"

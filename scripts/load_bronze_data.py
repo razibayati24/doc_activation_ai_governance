@@ -5,7 +5,7 @@
 # Execute on Databricks via: run_python_file_on_databricks(file_path="scripts/load_bronze_data.py")
 #
 # ============================================================================
-# Target: AT&T FinOps AI Governance demo
+# Target: Telco Bricks FinOps AI Governance demo
 # ============================================================================
 
 from pyspark.sql import SparkSession
@@ -23,7 +23,7 @@ VOLUME_PATH = f"/Volumes/{CATALOG}/{SCHEMA}/{VOLUME}/bronze_data"
 # Ensure catalog, schema, and volume exist
 spark.sql(f"CREATE CATALOG IF NOT EXISTS {CATALOG}")
 spark.sql(f"CREATE SCHEMA IF NOT EXISTS {CATALOG}.{SCHEMA}")
-spark.sql(f"CREATE VOLUME IF NOT EXISTS {CATALOG}.{SCHEMA}.{VOLUME} COMMENT 'Raw data for AT&T FinOps AI Governance demo'")
+spark.sql(f"CREATE VOLUME IF NOT EXISTS {CATALOG}.{SCHEMA}.{VOLUME} COMMENT 'Raw data for Telco Bricks FinOps AI Governance demo'")
 
 # Also create the ai_contracts folder used by PDFs + Knowledge Assistant
 spark.sql(f"CREATE VOLUME IF NOT EXISTS {CATALOG}.{SCHEMA}.{VOLUME}")
@@ -54,8 +54,8 @@ SVC-0002,Claude 3 Opus Enterprise,LLM API,Anthropic,Frontier Model Lab,2024,Toke
 
 
 AI_CONTRACTS_CSV = """agreement_id,service_id,vendor,business_unit,deployment_region,service_category,commitment_type,contract_start,contract_end,committed_spend_usd,overage_rate_pct,contract_status,created_at,updated_at
-AI-0001,SVC-0001,OpenAI,ATT-BUS,US-East,LLM API,Enterprise,2024-07-01,2026-06-30,8000000.0,0.15,Active,2024-04-10T00:00:00,2025-12-15T00:00:00
-AI-0001,SVC-0001,OpenAI,AT&T Business,US-West,LLM API,Enterprise,2024-07-01,2026-06-30,8000000.0,0.15,Active,2024-04-10T00:00:00,2025-12-15T00:00:00
+AI-0001,SVC-0001,OpenAI,TB-BUS,US-East,LLM API,Enterprise,2024-07-01,2026-06-30,8000000.0,0.15,Active,2024-04-10T00:00:00,2025-12-15T00:00:00
+AI-0001,SVC-0001,OpenAI,Telco Bricks Business,US-West,LLM API,Enterprise,2024-07-01,2026-06-30,8000000.0,0.15,Active,2024-04-10T00:00:00,2025-12-15T00:00:00
 AI-0002,SVC-0002,Anthropic,Customer Experience,US-East,LLM API,Enterprise,2024-10-01,2027-09-30,5000000.0,0.1,Active,2024-07-20T00:00:00,2025-10-01T00:00:00
 AI-0003,SVC-0003,Google Cloud,Mobility,US-Central,LLM API,Enterprise,2024-01-15,2027-12-31,12000000.0,,Active,2023-10-15T00:00:00,2025-08-20T00:00:00
 AI-0003,SVC-0003,Google Cloud,Mobility,US-East,LLM API,Enterprise,2024-01-15,2027-12-31,12000000.0,,Active,2023-10-15T00:00:00,2025-08-20T00:00:00
@@ -294,7 +294,7 @@ def _build_extracted_csv_from_manifest() -> str:
 
 
 _FALLBACK_EXTRACTED_CSV = EXTRACTED_HEADER + """
-contract_001.pdf,AI-0001,SVC-0001,GPT-4 Turbo Enterprise,OpenAI,AT&T Business,US-East|US-West,LLM API,Enterprise,2024-07-01,2026-06-30,8000000.0,0.15,Active,90,true,false,true,false,false,true,true,SOC 2 Type II
+contract_001.pdf,AI-0001,SVC-0001,GPT-4 Turbo Enterprise,OpenAI,Telco Bricks Business,US-East|US-West,LLM API,Enterprise,2024-07-01,2026-06-30,8000000.0,0.15,Active,90,true,false,true,false,false,true,true,SOC 2 Type II
 contract_002.pdf,AI-0002,SVC-0002,Claude 3 Opus Enterprise,Anthropic,Customer Experience,US-East,LLM API,Enterprise,2024-10-01,2027-09-30,5000000.0,0.10,Active,120,false,false,true,true,true,true,true,SOC 2 Type II|ISO 27001|HIPAA BAA available
 contract_003.pdf,AI-0003,SVC-0003,Gemini 1.5 Pro (Vertex AI),Google Cloud,Mobility,US-Central|US-East,LLM API,Enterprise,2024-01-15,2027-12-31,12000000.0,,Active,180,true,false,true,true,true,true,false,SOC 2 Type II|ISO 27001|ISO 27017|ISO 27018|HIPAA BAA|FedRAMP Moderate
 contract_004.pdf,AI-0004,SVC-0004,Amazon Bedrock Model Suite,Amazon Web Services,Network Operations,US-East|US-West|EU-West,LLM API,Standard,2023-06-01,2026-06-30,3500000.0,0.12,Active,60,false,false,true,true,false,true,true,SOC 2 Type II|ISO 27001|FedRAMP Moderate|HIPAA BAA
@@ -331,7 +331,7 @@ for filename, content in [
 
 print(f"\n✅ Bronze CSV files uploaded to {VOLUME_PATH}/")
 print(f"\n📊 Data quality issues present (silver layer cleans these):")
-print(f"   - BU code variants: ATT-BUS, ENG, CW, MOB")
+print(f"   - BU code variants: TB-BUS, ENG, CW, MOB")
 print(f"   - Duplicate service rows: SVC-0001, SVC-0002")
 print(f"   - Duplicate contract rows: AI-0003, AI-0007, AI-0011")
 print(f"   - Date anomaly: AI-0003 duplicate with contract_end < contract_start")

@@ -1,6 +1,6 @@
 {
-  "app_name": "AT&T AI Governance",
-  "app_subtitle": "FinOps & Responsible-AI Intelligence Across AT&T",
+  "app_name": "Telco Bricks AI Governance",
+  "app_subtitle": "FinOps & Responsible-AI Intelligence Across Telco Bricks",
   "app_icon": "⬡",
   "accent_color": "#00A8E0",
   "accent_gradient_end": "#005F8C",
@@ -22,7 +22,7 @@
       "label": "Governance Actions",
       "icon": "◆",
       "color": "#E8945A",
-      "description": "Routes governance issues to the AT&T AI Council via Salesforce"
+      "description": "Routes governance issues to the Telco Bricks AI Council via Salesforce"
     }
   },
   "demo_paths": [
@@ -32,8 +32,8 @@
       "questions": [
         "Which AI vendor contracts are trending over committed spend this quarter, and by how much?",
         "Show the spend utilization ratio for every active AI contract, highest first.",
-        "What are the data-residency and training-data-usage clauses in the AT&T–OpenAI GPT-4 Turbo Enterprise agreement?",
-        "Flag the OpenAI GPT-4 Turbo Enterprise contract for governance review — missing AI governance addendum, ambiguous training-data language, expiring in Jun 2026. Assign to the AT&T AI Council."
+        "What are the data-residency and training-data-usage clauses in the Telco Bricks–OpenAI GPT-4 Turbo Enterprise agreement?",
+        "Flag the OpenAI GPT-4 Turbo Enterprise contract for governance review — missing AI governance addendum, ambiguous training-data language, expiring in Jun 2026. Assign to the Telco Bricks AI Council."
       ]
     },
     {
@@ -42,7 +42,7 @@
       "questions": [
         "Which AI contracts expire in the next 90 days or are missing an AI governance addendum?",
         "Which business units have the most active contracts without a training-data restriction clause?",
-        "Does the AT&T–Anthropic Claude 3 Opus agreement permit AT&T customer data to be used for model training?",
+        "Does the Telco Bricks–Anthropic Claude 3 Opus agreement permit Telco Bricks customer data to be used for model training?",
         "Are there any AI contracts that allow EU data residency? Which ones, and in which BUs?"
       ]
     },
@@ -52,7 +52,7 @@
       "questions": [
         "What is our total AI vendor spend by service category and business unit, ranked by committed value?",
         "Show me total committed AI spend by vendor, ranked.",
-        "Which vendors have the most BU-level coverage at AT&T?",
+        "Which vendors have the most BU-level coverage at Telco Bricks?",
         "Compare LLM API spend to ML Platform spend across the portfolio."
       ]
     },

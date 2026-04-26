@@ -1,6 +1,6 @@
-# AT&T FinOps AI Governance Demo
+# Telco Bricks FinOps AI Governance Demo
 
-A Databricks demo for **AI vendor governance and FinOps** — built on the Document Activation reference architecture (Lakeflow medallion + Genie + Knowledge Assistant + Multi-Agent Supervisor + a Streamlit App), adapted for AT&T's enterprise AI portfolio.
+A Databricks demo for **AI vendor governance and FinOps** — built on the Document Activation reference architecture (Lakeflow medallion + Genie + Knowledge Assistant + Multi-Agent Supervisor + a Streamlit App), adapted for Telco Bricks's enterprise AI portfolio.
 
 The demo answers two complementary classes of question over the same domain:
 
@@ -14,15 +14,15 @@ Two specialist agents are wrapped by a **Multi-Agent Supervisor** that performs 
 ## Architecture
 
 ```
-                  Browser (razi.bayati  OR  daniel.perez)
+                Browser (any signed-in workspace user)
                                 │
                                 │  user OAuth token (X-Forwarded-Access-Token)
                                 ▼
-                    Databricks App: att-finops-ai-gov
-                       (Streamlit, OBO enabled)
+                  Databricks App: att-finops-ai-gov
+                     (Streamlit, OBO enabled)
                                 │
                                 ▼
-                MAS endpoint: mas-c39464e9-endpoint
+                MAS endpoint: mas-<id>-endpoint
                    (Multi-Agent Supervisor)
                   ┌─────────────┴─────────────┐
                   ▼                           ▼
@@ -35,7 +35,7 @@ Two specialist agents are wrapped by a **Multi-Agent Supervisor** that performs 
        ai_governance_doc_intelligence
 ```
 
-Per-user identity propagates all the way to SQL: the Genie space is `run_as=VIEWER`, so when daniel asks a question through the app, the SQL on the masked view runs as `daniel.perez@databricks.com` and the column-mask UDFs return redacted values. Razi gets the real ones.
+Per-user identity propagates all the way to SQL: the Genie space is `run_as=VIEWER`, so when a user asks a question through the app, the SQL runs as that user. Column-level masking on the audit view returns real values for **super-user group members** and redacted values for everyone else.
 
 ---
 
@@ -54,7 +54,7 @@ Per-user identity propagates all the way to SQL: the Genie space is `run_as=VIEW
 
 ## Demo data
 
-15 synthetic AI vendor agreements between AT&T business units and major AI vendors:
+15 synthetic AI vendor agreements between Telco Bricks business units and major AI vendors:
 
 | | | |
 |-|-|-|
@@ -72,7 +72,14 @@ Each contract has structured commercial terms (committed spend, overage rates, t
 
 `v_ai_access_audit` is a UC view over `system.access.audit` filtered to AI services (Genie, Vector Search, Model Serving, Agent Framework, MLflow Trace, Feature Store), with **inline column masks** on user email, display name, and source IP.
 
-The mask UDFs (`mask_email`, `mask_name`, `mask_ip`) return the real value when `current_user() = 'razi.bayati@databricks.com'` and a redaction otherwise. With OBO enabled in the app, the same question through the same app yields different results for different users — driven entirely by Unity Catalog identity, not application logic.
+**Default behavior is masked.** The mask UDFs (`mask_email`, `mask_name`, `mask_ip`) check `is_account_group_member('att_ai_gov_super_users')`:
+
+- **Members of the `att_ai_gov_super_users` account group** see the real values (full email, display name, source IP).
+- **Everyone else** — every regular workspace user, including any new user who joins later — sees redacted values (`***@<domain>`, `REDACTED`, `X.X.X.X`) automatically. No per-user opt-out, no allow-list to maintain.
+
+To grant a teammate the unmasked view, the workspace admin adds them to the `att_ai_gov_super_users` group. To revoke, remove them. Membership changes take effect on the next query — no UDF or view changes required.
+
+With OBO enabled in the app, the same question asked through the same app by two different people yields different results — driven entirely by Unity Catalog group membership, not application logic.
 
 ---
 
@@ -87,7 +94,7 @@ The mask UDFs (`mask_email`, `mask_name`, `mask_ip`) return the real value when 
 7. Create the Multi-Agent Supervisor wrapping both.
 8. Deploy the Streamlit App. Set `MAS_ENDPOINT_NAME` env var. Set `user_api_scopes` for OBO. Grant the App SP and end users the right UC + endpoint permissions.
 
-The `CLAUDE.md` file walks through the canonical version of these steps for the original RightsIQ template; this repo is the AT&T-adapted output of that workflow.
+The `CLAUDE.md` file walks through the canonical version of these steps for the original RightsIQ template; this repo is the Telco Bricks-adapted output of that workflow.
 
 ---
 
@@ -99,4 +106,4 @@ The `CLAUDE.md` file walks through the canonical version of these steps for the 
 - **Phase 2**: Classify each question as Structured (Genie) vs Language (KA), and design 3 gold tables.
 - **Phase 3**: Map your column names back to the reference schema.
 
-This repo is the result of running that process for AT&T FinOps AI Governance — the output to look at if you want a worked example beyond the original RightsIQ media-licensing reference.
+This repo is the result of running that process for Telco Bricks FinOps AI Governance — the output to look at if you want a worked example beyond the original RightsIQ media-licensing reference.

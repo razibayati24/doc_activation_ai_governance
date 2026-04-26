@@ -1,7 +1,7 @@
 resources:
   pipelines:
     att_finops_ai_governance_pipeline:
-      name: "AT&T FinOps AI Governance Pipeline [${bundle.target}]"
+      name: "Telco Bricks FinOps AI Governance Pipeline [${bundle.target}]"
       catalog: cmegdemos_catalog
       schema: ai_governance
       serverless: true

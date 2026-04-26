@@ -1,5 +1,5 @@
 """
-AT&T AI Governance — FinOps & Responsible-AI Intelligence
+Telco Bricks AI Governance — FinOps & Responsible-AI Intelligence
 Calls a Multi-Agent Supervisor that orchestrates Genie (finops_explorer) + KA (contract_analyst).
 """
 
@@ -13,7 +13,7 @@ import streamlit as st
 from databricks.sdk.core import Config
 
 st.set_page_config(
-    page_title="AT&T AI Governance",
+    page_title="Telco Bricks AI Governance",
     page_icon="⬡",
     layout="wide",
     initial_sidebar_state="expanded",
@@ -22,8 +22,8 @@ st.set_page_config(
 # ── Config ───────────────────────────────────────────────────────────────────
 CONFIG_PATH = Path(__file__).parent / "app_config.json"
 DEFAULT_CONFIG = {
-    "app_name": "AT&T AI Governance",
-    "app_subtitle": "FinOps & Responsible-AI Intelligence Across AT&T",
+    "app_name": "Telco Bricks AI Governance",
+    "app_subtitle": "FinOps & Responsible-AI Intelligence Across Telco Bricks",
     "agents": {
         "contract_analyst": {"label": "Contract Analyst", "icon": "◆", "color": "#6B9BD2"},
         "finops_explorer": {"label": "FinOps Explorer", "icon": "◆", "color": "#7BC88F"},
@@ -257,7 +257,7 @@ with st.sidebar:
     st.markdown(
         f'<div style="padding:8px 0 4px;">'
         f'<span style="font-family:DM Sans,sans-serif;font-size:1.15rem;font-weight:700;color:white;letter-spacing:-0.02em;">'
-        f'⬡ {config.get("app_name", "AT&T AI Governance")}</span>'
+        f'⬡ {config.get("app_name", "Telco Bricks AI Governance")}</span>'
         f'</div>',
         unsafe_allow_html=True,
     )
@@ -316,7 +316,7 @@ with st.sidebar:
 # ── Main ─────────────────────────────────────────────────────────────────────
 st.markdown(
     f'<div class="brand-header">'
-    f'<h1>⬡ {config.get("app_name", "AT&T AI Governance")}</h1>'
+    f'<h1>⬡ {config.get("app_name", "Telco Bricks AI Governance")}</h1>'
     f'<p>{config.get("app_subtitle", "")} · powered by {config.get("powered_by", "Databricks Agent Bricks")}</p>'
     f'</div>',
     unsafe_allow_html=True,
@@ -345,7 +345,7 @@ if prompt:
     with st.chat_message("assistant"):
         thinking = st.empty()
         thinking.markdown(
-            '<div class="thinking-bar"><div class="pulse"></div>Routing through AT&T AI Governance Supervisor…</div>',
+            '<div class="thinking-bar"><div class="pulse"></div>Routing through Telco Bricks AI Governance Supervisor…</div>',
             unsafe_allow_html=True,
         )
         api_messages = [{"role": m["role"], "content": m["content"]} for m in st.session_state.messages]

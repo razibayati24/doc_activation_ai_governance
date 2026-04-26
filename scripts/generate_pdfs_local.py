@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Manifest-driven PDF generation for AT&T FinOps AI Governance demo.
+Manifest-driven PDF generation for Telco Bricks FinOps AI Governance demo.
 Reads contract specs from demo_manifest.json (deterministic fields),
 uses Databricks Foundation Models to generate AI vendor contract prose,
 converts to PDF, and uploads to UC Volume for Knowledge Assistant indexing.
@@ -195,7 +195,7 @@ def manifest_contract_to_spec(contract: dict) -> dict:
         "title": f"AI Services Agreement — {contract['service_name']}",
         "parties": {
             "vendor": contract["vendor"],
-            "customer": f"AT&T Inc. ({contract['business_unit']} Business Unit)",
+            "customer": f"Telco Bricks Inc. ({contract['business_unit']} Business Unit)",
         },
         "service_name": contract["service_name"],
         "service_category": category_label,
@@ -209,7 +209,7 @@ def manifest_contract_to_spec(contract: dict) -> dict:
         "clause_instructions": clause_instructions,
         "agreement_id": contract["agreement_id"],
         "contract_number": contract["contract_number"],
-        "question": f"What are the data-residency, training-data, and AI governance clauses in the AT&T–{contract['vendor']} {contract['service_name']} agreement?",
+        "question": f"What are the data-residency, training-data, and AI governance clauses in the Telco Bricks–{contract['vendor']} {contract['service_name']} agreement?",
         "guideline": f"Answer should reference data residency: "
                      f"{'YES — ' + contract.get('data_residency_terms', '') if contract.get('has_data_residency_clause') else 'NOT SPECIFIED'}; "
                      f"training data restriction: "
@@ -226,7 +226,7 @@ def manifest_contract_to_spec(contract: dict) -> dict:
 def generate_contract_html(spec: dict, index: int) -> str:
     clause_block = "\n".join(f"- {ci}" for ci in spec.get("clause_instructions", []))
 
-    prompt = f"""You are an enterprise procurement and technology-sourcing attorney drafting an AI vendor services agreement between AT&T and a major AI vendor. Write a detailed, realistic contract in formal legal prose.
+    prompt = f"""You are an enterprise procurement and technology-sourcing attorney drafting an AI vendor services agreement between Telco Bricks and a major AI vendor. Write a detailed, realistic contract in formal legal prose.
 
 CONTRACT DETAILS — USE THESE EXACT VALUES. Do not change names, amounts, or dates:
 - Vendor: {spec['parties']['vendor']}
@@ -380,7 +380,7 @@ CRITICAL INSTRUCTIONS:
 <body>
 
 <div class="header">
-  <h1>AT&amp;T AI Vendor Services Agreement</h1>
+  <h1>Telco Bricks AI Vendor Services Agreement</h1>
   <div class="subtitle">{spec['title']}</div>
   <div class="contract-number">Agreement Reference: {spec['agreement_id']}</div>
 </div>
@@ -413,7 +413,7 @@ CRITICAL INSTRUCTIONS:
   </div>
   <div class="sig-col">
     <div class="sig-line">
-      Authorized Signature — AT&amp;T Inc.<br>
+      Authorized Signature — Telco Bricks Inc.<br>
       Name: ___________________________<br>
       Title: ___________________________<br>
       Date: ___________________________
@@ -422,7 +422,7 @@ CRITICAL INSTRUCTIONS:
 </div>
 
 <div class="footer">
-  CONFIDENTIAL — AT&amp;T Proprietary. This document contains confidential commercial and
+  CONFIDENTIAL — Telco Bricks Proprietary. This document contains confidential commercial and
   technical terms. Distribution or reproduction without express written consent is prohibited.
 </div>
 
@@ -528,7 +528,7 @@ def upload_file_to_volume(local_path: str, volume_dest: str, w: "WorkspaceClient
 # ============================================================================
 def main():
     print("=" * 60)
-    print("AT&T FinOps AI Governance — Manifest-Driven Contract PDF Generation")
+    print("Telco Bricks FinOps AI Governance — Manifest-Driven Contract PDF Generation")
     print("=" * 60)
     print(f"Target: {VOLUME_PATH}")
     print()

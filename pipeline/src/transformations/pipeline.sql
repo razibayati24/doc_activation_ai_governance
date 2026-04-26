@@ -1,4 +1,4 @@
--- AT&T FinOps AI Governance — Lakeflow Pipeline
+-- Telco Bricks FinOps AI Governance — Lakeflow Pipeline
 --
 -- ARCHITECTURE:
 --   bronze_extracted_ai_contracts (from PDF extraction) ──→ silver_ai_services
@@ -78,8 +78,8 @@ AS SELECT
   service_name,
   vendor,
   CASE TRIM(bu_raw)
-    WHEN 'ATT-BUS' THEN 'AT&T Business'
-    WHEN 'ATTBUS'  THEN 'AT&T Business'
+    WHEN 'TB-BUS' THEN 'Telco Bricks Business'
+    WHEN 'TBBUS'  THEN 'Telco Bricks Business'
     WHEN 'ENG'     THEN 'Engineering R&D'
     WHEN 'R&D'     THEN 'Engineering R&D'
     WHEN 'CW'      THEN 'Consumer Wireless'
@@ -332,7 +332,7 @@ LEFT JOIN (
 
 -- gold_bu_ai_overview: one row per business unit
 CREATE OR REFRESH MATERIALIZED VIEW gold_bu_ai_overview
-COMMENT "One row per AT&T business unit with portfolio-level AI spend and governance metrics."
+COMMENT "One row per Telco Bricks business unit with portfolio-level AI spend and governance metrics."
 AS
 WITH contract_per_bu AS (
   SELECT DISTINCT
