@@ -1,0 +1,15 @@
+resources:
+  pipelines:
+    att_finops_ai_governance_pipeline:
+      name: "AT&T FinOps AI Governance Pipeline [${bundle.target}]"
+      catalog: cmegdemos_catalog
+      schema: ai_governance
+      serverless: true
+      channel: PREVIEW
+
+      libraries:
+        - notebook:
+            path: ${workspace.file_path}/src/transformations/pipeline.sql
+
+      configuration:
+        pipelines.enableTrackHistory: "true"

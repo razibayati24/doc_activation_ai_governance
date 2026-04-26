@@ -1,0 +1,108 @@
+{
+  "use_case": "RightsIQ - Media Licensing Rights Management",
+  "vertical": "Media & Entertainment",
+  "document_type": "Media Licensing Rights Contracts",
+
+  "pdf_generation": {
+    "description": "Media licensing rights contracts between content distributors and studios/networks. Each contract should include: Parties (licensor and licensee with company names), Licensed titles (specific movie or TV show names), Territory grants (specific countries or regions like North America, EMEA, APAC), Media types (theatrical, streaming, broadcast, home video, airline), License windows with specific start and end dates, Exclusivity terms (exclusive vs non-exclusive per territory/media type), Financial terms (minimum guarantees, revenue shares, advance payments), Renewal and termination clauses, Delivery requirements and technical specifications, Reporting and audit rights. Make contracts realistic with varied structures — some covering single titles, others covering libraries of 5-10 titles. Include both exclusive and non-exclusive arrangements across different territories.",
+    "count": 15,
+    "doc_size": "MEDIUM",
+    "catalog": "REPLACE_WITH_CATALOG",
+    "schema": "REPLACE_WITH_SCHEMA",
+    "volume": "REPLACE_WITH_VOLUME",
+    "folder": "rights_contracts"
+  },
+
+  "structured_tables": {
+    "titles": {
+      "description": "Content catalog of licensed titles",
+      "row_count": 200,
+      "columns": {
+        "title_id": {"type": "STRING", "role": "pk"},
+        "title_name": {"type": "STRING", "description": "Movie or TV show name"},
+        "title_type": {"type": "STRING", "values": ["Film", "Series", "Documentary", "Special"]},
+        "genre": {"type": "STRING", "values": ["Action", "Drama", "Comedy", "Thriller", "Sci-Fi", "Horror", "Romance", "Animation"]},
+        "release_year": {"type": "INT", "range": [1990, 2025]},
+        "studio": {"type": "STRING", "description": "Production studio name"},
+        "content_rating": {"type": "STRING", "values": ["G", "PG", "PG-13", "R", "TV-MA", "TV-14", "TV-PG"]}
+      }
+    },
+    "rights_agreements": {
+      "description": "Licensing agreements linking titles to territories and media types",
+      "row_count": 500,
+      "columns": {
+        "agreement_id": {"type": "STRING", "role": "pk"},
+        "title_id": {"type": "STRING", "role": "fk", "references": "titles.title_id"},
+        "licensor": {"type": "STRING", "description": "Studio or network granting rights"},
+        "licensee": {"type": "STRING", "description": "Distributor or platform acquiring rights"},
+        "territory": {"type": "STRING", "description": "Country or region"},
+        "media_type": {"type": "STRING", "values": ["Streaming", "Theatrical", "Broadcast", "Home Video", "Airline", "AVOD"]},
+        "exclusivity": {"type": "STRING", "values": ["Exclusive", "Non-Exclusive"]},
+        "license_start": {"type": "DATE"},
+        "license_end": {"type": "DATE"},
+        "minimum_guarantee_usd": {"type": "DOUBLE", "range": [10000, 5000000]},
+        "revenue_share_pct": {"type": "DOUBLE", "range": [0.05, 0.50]},
+        "contract_status": {"type": "STRING", "values": ["Active", "Expired", "Pending", "Terminated"]},
+        "created_at": {"type": "TIMESTAMP"},
+        "updated_at": {"type": "TIMESTAMP"}
+      }
+    },
+    "royalty_transactions": {
+      "description": "Royalty payment records tied to agreements",
+      "row_count": 2000,
+      "columns": {
+        "transaction_id": {"type": "STRING", "role": "pk"},
+        "agreement_id": {"type": "STRING", "role": "fk", "references": "rights_agreements.agreement_id"},
+        "period_start": {"type": "DATE"},
+        "period_end": {"type": "DATE"},
+        "gross_revenue_usd": {"type": "DOUBLE", "range": [1000, 2000000]},
+        "royalty_amount_usd": {"type": "DOUBLE"},
+        "payment_status": {"type": "STRING", "values": ["Paid", "Pending", "Overdue", "Disputed"]},
+        "payment_date": {"type": "DATE", "nullable": true},
+        "report_date": {"type": "TIMESTAMP"}
+      }
+    }
+  },
+
+  "data_quality_issues": {
+    "duplicate_rate": 0.05,
+    "null_rate": 0.03,
+    "territory_variants": {
+      "United States": ["US", "USA", "United States", "U.S.", "U.S.A."],
+      "United Kingdom": ["UK", "United Kingdom", "Great Britain", "GB"],
+      "Germany": ["Germany", "Deutschland", "DE"]
+    },
+    "date_anomaly_rate": 0.01
+  },
+
+  "silver_transformations": {
+    "deduplication_keys": {
+      "titles": ["title_id"],
+      "rights_agreements": ["agreement_id"],
+      "royalty_transactions": ["transaction_id"]
+    },
+    "territory_standardization": {
+      "US": "United States", "USA": "United States", "U.S.": "United States", "U.S.A.": "United States",
+      "UK": "United Kingdom", "Great Britain": "United Kingdom", "GB": "United Kingdom",
+      "Deutschland": "Germany", "DE": "Germany"
+    },
+    "filter_rules": [
+      "Remove rights_agreements where license_end < license_start"
+    ]
+  },
+
+  "gold_aggregations": {
+    "rights_by_title_territory": {
+      "grain": ["title_id", "territory"],
+      "metrics": ["agreement_count", "total_minimum_guarantee", "earliest_license_start", "latest_license_end", "media_types_list", "active_agreement_count"]
+    },
+    "royalty_summary": {
+      "grain": ["agreement_id"],
+      "metrics": ["total_gross_revenue", "total_royalties", "last_payment_date", "outstanding_amount", "payment_status_distribution"]
+    },
+    "territory_overview": {
+      "grain": ["territory"],
+      "metrics": ["title_count", "total_minimum_guarantee", "total_royalty_revenue", "agreement_count_by_status", "top_licensors"]
+    }
+  }
+}

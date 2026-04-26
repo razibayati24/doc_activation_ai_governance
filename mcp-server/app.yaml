@@ -1,0 +1,19 @@
+# Document Activation MCP Server — Databricks App Configuration
+#
+# This is a SEPARATE app from the Phase 4 chat UI.
+# It implements the MCP JSON-RPC 2.0 protocol and calls the Salesforce REST API.
+#
+# IMPORTANT: Replace the env values below with your Salesforce Developer Edition credentials.
+
+command:
+  - /bin/sh
+  - -c
+  - "uvicorn mcp_server:app --host 0.0.0.0 --port $DATABRICKS_APP_PORT"
+
+env:
+  - name: SF_INSTANCE_URL
+    value: "REPLACE_WITH_SF_INSTANCE_URL"
+  - name: SF_CLIENT_ID
+    value: "REPLACE_WITH_SF_CLIENT_ID"
+  - name: SF_CLIENT_SECRET
+    value: "REPLACE_WITH_SF_CLIENT_SECRET"

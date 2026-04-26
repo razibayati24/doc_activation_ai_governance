@@ -1,0 +1,23 @@
+{
+  "display_name": "AT&T AI Governance Explorer",
+  "description": "Explore AT&T's enterprise AI vendor portfolio — contracts, committed spend vs actuals, governance addenda coverage, and by-BU breakdowns. Tables include AI vendor contracts (with deployment region, service category, commitment type, and governance flags), AI services catalog, and quarterly spend transactions. Tables join on agreement_id and service_id. Use gold_ai_spend_by_vendor_bu for portfolio views, gold_contract_summary for per-contract drill-down including overage and governance flags, and gold_bu_ai_overview for business-unit-level metrics.",
+  "table_identifiers": [
+    "cmegdemos_catalog.ai_governance.gold_ai_spend_by_vendor_bu",
+    "cmegdemos_catalog.ai_governance.gold_contract_summary",
+    "cmegdemos_catalog.ai_governance.gold_bu_ai_overview",
+    "cmegdemos_catalog.ai_governance.silver_ai_contracts",
+    "cmegdemos_catalog.ai_governance.silver_ai_services"
+  ],
+  "sample_questions": [
+    "Which AI vendor contracts are trending over committed spend this quarter, and by how much?",
+    "What is our total AI vendor spend by service category and business unit, ranked by committed value?",
+    "Which AI contracts expire in the next 90 days or are missing an AI governance addendum?",
+    "Show me total committed AI spend by vendor, ranked",
+    "Which business units have the most active AI contracts without a training-data restriction clause?",
+    "What is the total overage spend across all active AI contracts?",
+    "Compare LLM API spend to ML Platform spend across the portfolio",
+    "Which vendors have the most BU-level coverage at AT&T?",
+    "List all contracts with FedRAMP or HIPAA certifications",
+    "What is the average spend utilization ratio for Enterprise-tier contracts versus Standard-tier?"
+  ]
+}

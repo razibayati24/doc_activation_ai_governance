@@ -1,0 +1,16 @@
+command:
+  - streamlit
+  - run
+  - app.py
+
+env:
+  - name: MAS_ENDPOINT_NAME
+    value: "mas-c39464e9-endpoint"
+
+# Enable User-On-Behalf-Of (OBO): the app receives the viewer's OAuth token in
+# X-Forwarded-Access-Token and uses it to call the MAS endpoint, so downstream
+# Genie queries run as the actual user — column-level masks then apply per-user.
+user_api_scopes:
+  - serving.serving-endpoints
+  - dashboards.genie
+  - sql

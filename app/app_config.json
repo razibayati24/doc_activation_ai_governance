@@ -1,0 +1,71 @@
+{
+  "app_name": "AT&T AI Governance",
+  "app_subtitle": "FinOps & Responsible-AI Intelligence Across AT&T",
+  "app_icon": "⬡",
+  "accent_color": "#00A8E0",
+  "accent_gradient_end": "#005F8C",
+  "powered_by": "Databricks Agent Bricks",
+  "agents": {
+    "contract_analyst": {
+      "label": "Contract Analyst",
+      "icon": "◆",
+      "color": "#6B9BD2",
+      "description": "Searches AI vendor contract PDFs for data-use, governance, and termination clauses"
+    },
+    "data_explorer": {
+      "label": "FinOps Explorer",
+      "icon": "◆",
+      "color": "#7BC88F",
+      "description": "Queries structured AI spend and governance data — overage, coverage, by-BU and by-vendor analytics"
+    },
+    "governance_actions": {
+      "label": "Governance Actions",
+      "icon": "◆",
+      "color": "#E8945A",
+      "description": "Routes governance issues to the AT&T AI Council via Salesforce"
+    }
+  },
+  "demo_paths": [
+    {
+      "title": "Overbudget Risk",
+      "icon": "▲",
+      "questions": [
+        "Which AI vendor contracts are trending over committed spend this quarter, and by how much?",
+        "Show the spend utilization ratio for every active AI contract, highest first.",
+        "What are the data-residency and training-data-usage clauses in the AT&T–OpenAI GPT-4 Turbo Enterprise agreement?",
+        "Flag the OpenAI GPT-4 Turbo Enterprise contract for governance review — missing AI governance addendum, ambiguous training-data language, expiring in Jun 2026. Assign to the AT&T AI Council."
+      ]
+    },
+    {
+      "title": "Governance Coverage",
+      "icon": "◆",
+      "questions": [
+        "Which AI contracts expire in the next 90 days or are missing an AI governance addendum?",
+        "Which business units have the most active contracts without a training-data restriction clause?",
+        "Does the AT&T–Anthropic Claude 3 Opus agreement permit AT&T customer data to be used for model training?",
+        "Are there any AI contracts that allow EU data residency? Which ones, and in which BUs?"
+      ]
+    },
+    {
+      "title": "Portfolio View",
+      "icon": "▣",
+      "questions": [
+        "What is our total AI vendor spend by service category and business unit, ranked by committed value?",
+        "Show me total committed AI spend by vendor, ranked.",
+        "Which vendors have the most BU-level coverage at AT&T?",
+        "Compare LLM API spend to ML Platform spend across the portfolio."
+      ]
+    },
+    {
+      "title": "Compliance Review",
+      "icon": "●",
+      "questions": [
+        "List all AI contracts with FedRAMP or HIPAA compliance certifications.",
+        "Which vendors have the strongest governance posture — training restriction + governance addendum + data residency?",
+        "What are the MFN and price-protection clauses in the NVIDIA DGX Cloud agreement?",
+        "Flag the Snowflake Cortex contract for governance review — missing AI governance addendum, expiring Jul 2026. Route to AI Council."
+      ]
+    }
+  ],
+  "placeholder": "Ask about AI spend, vendor contracts, governance clauses, or take action on a contract…"
+}

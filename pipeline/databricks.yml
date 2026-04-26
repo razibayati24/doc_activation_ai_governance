@@ -1,0 +1,15 @@
+bundle:
+  name: att_finops_ai_governance_pipeline
+
+targets:
+  dev:
+    mode: development
+    default: true
+    workspace:
+      host: https://fevm-cmegdemos.cloud.databricks.com
+      profile: fevm-cmegdemos
+
+  prod:
+    workspace:
+      host: https://fevm-cmegdemos.cloud.databricks.com
+      profile: fevm-cmegdemos
