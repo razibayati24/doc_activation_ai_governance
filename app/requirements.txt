@@ -1,3 +1,4 @@
 streamlit
 requests
 databricks-sdk
+mlflow>=2.20.0

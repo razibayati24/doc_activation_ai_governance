@@ -7,4 +7,5 @@ dependencies = [
     "streamlit>=1.38.0",
     "databricks-sdk>=0.20.0",
     "requests>=2.31.0",
+    "mlflow>=2.20.0",
 ]

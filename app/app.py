@@ -8,9 +8,11 @@ import os
 import re
 from pathlib import Path
 
+import mlflow
 import requests
 import streamlit as st
 from databricks.sdk.core import Config
+from mlflow.entities import SpanType
 
 st.set_page_config(
     page_title="Telco Bricks AI Governance",
@@ -48,6 +50,20 @@ config = load_config()
 cfg = Config()
 MAS_ENDPOINT_NAME = os.getenv("MAS_ENDPOINT_NAME", "mas-c39464e9-endpoint")
 SERVING_URL = f"{cfg.host.rstrip('/')}/serving-endpoints/{MAS_ENDPOINT_NAME}/invocations"
+
+
+# ── MLflow tracing ───────────────────────────────────────────────────────────
+# Each call to the Multi-Agent Supervisor produces one trace, with child spans
+# for the HTTP invocation and response parsing. The hosted MAS endpoint emits
+# its own server-side traces; this captures the App's view of each turn.
+MLFLOW_EXPERIMENT = os.getenv("MLFLOW_EXPERIMENT", "/Shared/telco-bricks-ai-gov")
+_TRACING_ENABLED = False
+try:
+    mlflow.set_tracking_uri("databricks")
+    mlflow.set_experiment(MLFLOW_EXPERIMENT)
+    _TRACING_ENABLED = True
+except Exception as _e:
+    print(f"MLflow tracing disabled: {_e}")
 
 
 # ── User-on-Behalf-Of (OBO) auth ─────────────────────────────────────────────
@@ -183,6 +199,7 @@ section[data-testid="stSidebar"] .streamlit-expanderHeader {
 
 
 # ── Supervisor call (single endpoint, MAS does the routing) ──────────────────
+@mlflow.trace(name="supervisor_turn", span_type=SpanType.AGENT)
 def call_supervisor(messages: list) -> tuple[str, str | None]:
     """Invoke the Multi-Agent Supervisor. Returns (answer_text, agent_name_called).
 
@@ -191,18 +208,42 @@ def call_supervisor(messages: list) -> tuple[str, str | None]:
     service principal token if OBO isn't available.
     """
     user_token = get_user_token()
+    user_email = get_user_email()
+    auth_mode = "obo" if user_token else "service_principal"
+
+    if _TRACING_ENABLED:
+        try:
+            mlflow.update_current_trace(
+                tags={
+                    "endpoint": MAS_ENDPOINT_NAME,
+                    "auth_mode": auth_mode,
+                    "user_email": user_email or "anonymous",
+                    "turn_messages": str(len(messages)),
+                }
+            )
+        except Exception:
+            pass
+
     if user_token:
         hdrs = {"Authorization": f"Bearer {user_token}", "Content-Type": "application/json"}
     else:
         hdrs = Config().authenticate()
         hdrs["Content-Type"] = "application/json"
-    try:
-        resp = requests.post(SERVING_URL, headers=hdrs, json={"input": messages}, timeout=180)
-        resp.raise_for_status()
-    except requests.HTTPError as e:
-        return f"Error {e.response.status_code}: {e.response.text[:300]}", None
-    except Exception as e:
-        return f"{type(e).__name__}: {e}", None
+
+    with mlflow.start_span(name="mas_invoke", span_type=SpanType.LLM) as span:
+        span.set_inputs({"endpoint": MAS_ENDPOINT_NAME, "messages": messages})
+        try:
+            resp = requests.post(SERVING_URL, headers=hdrs, json={"input": messages}, timeout=180)
+            resp.raise_for_status()
+        except requests.HTTPError as e:
+            err = f"Error {e.response.status_code}: {e.response.text[:300]}"
+            span.set_outputs({"error": err, "status_code": e.response.status_code})
+            return err, None
+        except Exception as e:
+            err = f"{type(e).__name__}: {e}"
+            span.set_outputs({"error": err})
+            return err, None
+        span.set_outputs({"status_code": resp.status_code, "size_bytes": len(resp.content)})
 
     data = resp.json()
     agent_called = None
@@ -214,6 +255,13 @@ def call_supervisor(messages: list) -> tuple[str, str | None]:
             for c in item.get("content", []):
                 if c.get("type") == "output_text" and c.get("text"):
                     last_text = c["text"]
+
+    if _TRACING_ENABLED and agent_called:
+        try:
+            mlflow.update_current_trace(tags={"agent_routed": agent_called})
+        except Exception:
+            pass
+
     return last_text or "No response received.", agent_called
 
 
