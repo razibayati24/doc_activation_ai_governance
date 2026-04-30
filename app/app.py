@@ -110,6 +110,40 @@ def get_user_email() -> str | None:
     return None
 
 
+def resolve_viewer_email() -> str | None:
+    """Best-effort viewer email resolution. Tries forwarded headers first;
+    falls back to SCIM /Me with the OBO token. Cached per Streamlit session.
+    """
+    cached = st.session_state.get("_viewer_email_resolved")
+    if cached is not None:
+        return cached or None  # cached == "" means we already tried and failed
+
+    email = get_user_email()
+    if email:
+        st.session_state["_viewer_email_resolved"] = email
+        return email
+
+    token = get_user_token()
+    if token:
+        try:
+            r = requests.get(
+                f"{cfg.host.rstrip('/')}/api/2.0/preview/scim/v2/Me",
+                headers={"Authorization": f"Bearer {token}"},
+                timeout=5,
+            )
+            if r.ok:
+                data = r.json()
+                # SCIM Me returns userName (often the email) and emails[]
+                email = data.get("userName") or (
+                    (data.get("emails") or [{}])[0].get("value")
+                )
+        except Exception:
+            email = None
+
+    st.session_state["_viewer_email_resolved"] = email or ""
+    return email
+
+
 # ── Theme ────────────────────────────────────────────────────────────────────
 st.markdown("""
 <style>
@@ -208,13 +242,14 @@ def call_supervisor(messages: list) -> tuple[str, str | None]:
     service principal token if OBO isn't available.
     """
     user_token = get_user_token()
-    user_email = get_user_email()
+    user_email = resolve_viewer_email()
     auth_mode = "obo" if user_token else "service_principal"
 
     if _TRACING_ENABLED:
         try:
             mlflow.update_current_trace(
                 tags={
+                    "mlflow.user": user_email or "anonymous",
                     "endpoint": MAS_ENDPOINT_NAME,
                     "auth_mode": auth_mode,
                     "user_email": user_email or "anonymous",
@@ -231,7 +266,11 @@ def call_supervisor(messages: list) -> tuple[str, str | None]:
         hdrs["Content-Type"] = "application/json"
 
     with mlflow.start_span(name="mas_invoke", span_type=SpanType.LLM) as span:
-        span.set_inputs({"endpoint": MAS_ENDPOINT_NAME, "messages": messages})
+        span.set_inputs({
+            "endpoint": MAS_ENDPOINT_NAME,
+            "viewer_email": user_email or "anonymous",
+            "messages": messages,
+        })
         try:
             resp = requests.post(SERVING_URL, headers=hdrs, json={"input": messages}, timeout=180)
             resp.raise_for_status()
@@ -316,7 +355,7 @@ with st.sidebar:
     )
 
     # Signed-in-as badge — shows OBO is active and which identity is calling
-    viewer_email = get_user_email()
+    viewer_email = resolve_viewer_email()
     obo_active = bool(get_user_token())
     if viewer_email or obo_active:
         badge_color = "#7BC88F" if obo_active else "#E8945A"
