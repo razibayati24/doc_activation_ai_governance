@@ -46,7 +46,7 @@ Per-user identity propagates all the way to SQL: the Genie space is `run_as=VIEW
 | **`pipeline/`** | Lakeflow Spark Declarative Pipeline. 2 bronze streaming tables, 3 silver materialized views, 3 gold materialized views. SQL only. Asset Bundle config in `databricks.yml` + `resources/pipeline.pipeline.yml`. |
 | **`scripts/`** | `load_bronze_data.py` — embeds the canonical bronze CSVs (services, contracts, spend transactions, extracted contracts) and uploads them to a UC Volume. `generate_pdfs_local.py` — manifest-driven PDF generator that calls the Databricks Foundation Model API to produce realistic AI vendor contracts. |
 | **`config/`** | `demo_manifest.json` — single source of truth for all 15 contracts. `genie_config.json` — Genie space tables and starter questions. `app_config.json` — branding, demo paths, agent labels for the Streamlit app. |
-| **`app/`** | Streamlit app (`app.py`) that calls the MAS endpoint with the viewer's OBO token. `app.yaml` declares `user_api_scopes` for Serving, Genie, and SQL. |
+| **`app/`** | Streamlit app (`app.py`) that calls the MAS endpoint with the viewer's OBO token. `app.yaml` declares `user_api_scopes` for Serving, Genie, and SQL. Each turn emits an MLflow trace (see [Observability](#observability-mlflow-tracing)). |
 | **`mcp-server/`** | Reference Salesforce MCP server (Phase 5, optional). Not deployed in this build. |
 | **`docs/`** | Extensibility guide, customization guide, MCP guide. |
 
@@ -83,6 +83,30 @@ With OBO enabled in the app, the same question asked through the same app by two
 
 ---
 
+## Observability (MLflow tracing)
+
+Every Supervisor turn produces one MLflow trace, with a child `mas_invoke` span around the HTTP call to the MAS endpoint. Traces land in the experiment at `/Shared/telco-bricks-ai-gov` (override via the `MLFLOW_EXPERIMENT` env var in `app.yaml`).
+
+Each trace is tagged with:
+
+| Tag | Value |
+|---|---|
+| `endpoint` | The MAS serving endpoint name |
+| `auth_mode` | `obo` (viewer's token) or `service_principal` (fallback) |
+| `user_email` | Forwarded `X-Forwarded-Email`, or `anonymous` |
+| `turn_messages` | Number of messages in the turn (conversation depth) |
+| `agent_routed` | `finops_explorer` (Genie) or `contract_analyst` (KA) — the sub-agent the supervisor picked |
+
+The hosted MAS endpoint emits its own richer server-side traces (router → sub-agent spans). The client-side trace described here is the App's view of each turn — useful for OBO debugging, latency, error capture, and per-user / per-agent breakdowns in an experiment the App owns.
+
+**Auth split.** MLflow tracing uses the App's service principal credentials; the MAS call still uses the viewer's OBO token. So tracing observes who used the app *without* changing how UC permissions resolve — the per-user masking sub-demo is unaffected.
+
+**Permissions.** The App SP needs `CAN_EDIT` (or ownership) of the experiment. If you let the SP create it on first run, ownership is automatic; otherwise pre-create the experiment as a workspace user and grant the SP `CAN_EDIT`. Workspace users who want to view traces in the UI need `CAN_READ` on the experiment.
+
+If MLflow init fails (no permissions, network, etc.), tracing is silently disabled and the app continues to function — `set_experiment` is wrapped in a try/except and the decorator becomes a no-op.
+
+---
+
 ## Build sequence (high-level)
 
 1. Create catalog/schema/volume.
@@ -92,7 +116,7 @@ With OBO enabled in the app, the same question asked through the same app by two
 5. Create the Genie Space pointing at the gold + silver tables.
 6. Create the Knowledge Assistant indexing the contract PDFs.
 7. Create the Multi-Agent Supervisor wrapping both.
-8. Deploy the Streamlit App. Set `MAS_ENDPOINT_NAME` env var. Set `user_api_scopes` for OBO. Grant the App SP and end users the right UC + endpoint permissions.
+8. Deploy the Streamlit App. Set `MAS_ENDPOINT_NAME` env var. Set `user_api_scopes` for OBO. Grant the App SP and end users the right UC + endpoint permissions. Pre-create (or let the SP own) the MLflow experiment at `/Shared/telco-bricks-ai-gov` for trace logging.
 
 The `CLAUDE.md` file walks through the canonical version of these steps for the original RightsIQ template; this repo is the Telco Bricks-adapted output of that workflow.
 
